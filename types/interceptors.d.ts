@@ -21,6 +21,8 @@ declare namespace Interceptors {
     throwOnError?: boolean
     /** Maximum number of response body bytes to include in the error. 0 disables the limit. @default 1048576 */
     maxSize?: number
+    /** Additional MIME types and their UTF-8 body parser. Built-in mappings can be overridden. */
+    mimeTypes?: Record<string, 'json' | 'text'>
   }
   export type CacheInterceptorOpts = CacheHandler.CacheOptions
 

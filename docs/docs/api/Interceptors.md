@@ -242,9 +242,10 @@ const agent = new Agent().compose(
 Converts 4xx/5xx responses into thrown `ResponseError` instances, making it
 easy to handle HTTP errors with a standard `try/catch` block.
 
-The error body is automatically decoded for `application/json` and
-`text/plain` responses. For JSON responses the body is parsed and exposed as
-`error.body`.
+The error body is automatically decoded as UTF-8 for `application/json` and
+`text/plain` responses. JSON bodies are parsed and exposed as `error.body`;
+invalid JSON is retained as text. Other MIME types can be configured with
+`mimeTypes`. Unrecognized types leave `error.body` empty.
 
 **Parameters**
 
@@ -253,6 +254,12 @@ The error body is automatically decoded for `application/json` and
     error. If the body exceeds this limit, the resulting `ResponseError`
     contains the retained prefix with `bodyTruncated` set to `true`. Set to `0`
     to disable the limit. **Default:** `1048576` (1 MiB).
+  * `mimeTypes` {Object} Additional mappings from a MIME type (without parameters)
+    to `'json'` or `'text'`. Keys are case-insensitive and response parameters
+    such as `charset` do not affect matching. Mappings extend the built-in
+    `application/json: 'json'` and `text/plain: 'text'` mappings, and can override
+    either. Both parsers decode UTF-8 and obey `maxSize`; truncated JSON remains
+    text and is not parsed.
 
 **Returns:** {Dispatcher.DispatcherComposeInterceptor}
 
@@ -261,7 +268,13 @@ The error body is automatically decoded for `application/json` and
 ```js
 import { Agent, interceptors, errors } from 'undici'
 
-const agent = new Agent().compose(interceptors.responseError())
+const agent = new Agent().compose(interceptors.responseError({
+  mimeTypes: {
+    'application/vnd.contentful.management.v1+json': 'json',
+    'text/javascript': 'json',
+    'text/xml': 'text'
+  }
+}))
 
 try {
   await agent.request({ origin: 'https://example.com', path: '/not-found', method: 'GET' })
