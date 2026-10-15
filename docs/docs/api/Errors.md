@@ -22,6 +22,19 @@ All errors, except [`HTTPParserError`][] and `WebAssemblyNotSupportedError`, ext
 carries a stable `code` string (for example `UND_ERR_CONNECT_TIMEOUT`) and a
 `name`.
 
+Errors associated with HTTP requests expose `requestUrls`, an array of the
+actual serialized URLs, including query parameters. For `fetch`, inspect the
+underlying `error.cause.requestUrls`. A shared transport or cancellation error
+may affect several requests, so the array accumulates each distinct URL without
+replacing the original error, its class, or its cause. A redirect failure records
+the URL of the failing hop.
+
+Authority credentials are removed, but query parameters are retained and may
+contain sensitive data. This context is not logged automatically. The property
+can be absent for errors raised before a request exists, custom dispatchers,
+non-URL request targets (`CONNECT` and `OPTIONS *`), or immutable/user-defined
+rejection reasons that cannot accept additional context.
+
 Because the bundled (global) dispatcher may come from a different undici version
 than the one you import directly, prefer matching on `error.code` rather than
 `instanceof errors.UndiciError`:
@@ -82,6 +95,8 @@ on a well-known symbol rather than the prototype chain.
 
 * `name` {string} Always `'UndiciError'`.
 * `code` {string} Always `'UND_ERR'`.
+* `requestUrls` {string[]|undefined} Serialized URLs of affected requests, when
+  available. The array can contain more than one URL when an error is shared.
 
 ## Class: `WebAssemblyNotSupportedError`
 

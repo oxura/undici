@@ -6,6 +6,7 @@ import { IncomingHttpHeaders } from '../../types/header'
 expectAssignable<errors.UndiciError>(new errors.UndiciError())
 expectAssignable<string>(new errors.UndiciError().name)
 expectAssignable<string>(new errors.UndiciError().code)
+expectAssignable<readonly string[] | undefined>(new errors.UndiciError().requestUrls)
 
 expectAssignable<Error>(new errors.WebAssemblyNotSupportedError())
 expectAssignable<errors.WebAssemblyNotSupportedError>(new errors.WebAssemblyNotSupportedError())

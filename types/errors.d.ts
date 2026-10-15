@@ -7,6 +7,8 @@ declare namespace Errors {
   export class UndiciError extends Error {
     name: string
     code: string
+    /** Actual URLs associated with a failed request, when available. Shared errors can affect several requests. */
+    readonly requestUrls?: readonly string[]
   }
 
   /** Connect timeout error. */
