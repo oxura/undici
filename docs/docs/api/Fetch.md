@@ -596,6 +596,10 @@ properties for reading a body. Each consuming method reads the body once; after
 the body has been consumed, [`bodyUsed`](#bodybodyused) becomes `true` and
 calling another consuming method throws a `TypeError`.
 
+Body parsing and transport failures retain their original error and stack, with
+the consuming caller's async stack appended when available. Immutable errors and
+non-error rejection reasons are returned unchanged.
+
 > [!WARNING]
 > The `arrayBuffer()`, `blob()`, `bytes()`, `formData()`, `json()`, and `text()`
 > methods buffer the entire body in memory before returning. Where applicable,
